@@ -1,0 +1,11 @@
+.git
+.github
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose*.yml
+monitoring/
+k8s/
+render.yaml
+README.md
+*.log

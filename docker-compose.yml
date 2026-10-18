@@ -1,0 +1,72 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Docker Hub container registry image name (replace 'dineshkumar2908' if your Docker Hub username differs)
+    image: dineshkumar2908/skillswapify:latest
+    container_name: skillswapify-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - skillswapify-net
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.3.0
+    container_name: skillswapify-nginx-exporter
+    restart: unless-stopped
+    command:
+      - "--nginx.scrape-uri=http://web:80/stub_status"
+    ports:
+      - "9113:9113"
+    depends_on:
+      web:
+        condition: service_healthy
+    networks:
+      - skillswapify-net
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: skillswapify-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+    ports:
+      - "9090:9090"
+    depends_on:
+      - nginx-exporter
+    networks:
+      - skillswapify-net
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: skillswapify-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - skillswapify-net
+
+networks:
+  skillswapify-net:
+    driver: bridge
