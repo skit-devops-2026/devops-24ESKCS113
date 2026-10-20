@@ -2,6 +2,9 @@
 
 **SkillSwapify** is a web-based skill-sharing platform built with standard HTML, CSS, and modern JavaScript. This repository contains the complete DevOps implementation for **Milestone 5 (Docker)**, **Milestone 6 (Deployment & Monitoring)**, and **Milestone 7 (Kubernetes)**.
 
+- **Live Deployed Application (Render)**: [https://skillswapify.onrender.com/](https://skillswapify.onrender.com/)
+- **Live Health Endpoint**: [https://skillswapify.onrender.com/healthz](https://skillswapify.onrender.com/healthz)
+
 ---
 
 ## 📑 Table of Contents
@@ -19,12 +22,13 @@
    - [Prometheus Metrics Setup](#prometheus-metrics-setup)
    - [Grafana Dashboard](#grafana-dashboard)
    - [Full Local Monitoring Stack](#running-the-local-monitoring-stack)
-5. [M7 — Kubernetes Orchestration](#-m7--kubernetes-orchestration)
+5. [📸 Deployment & Verification Screenshots](#-deployment--verification-screenshots)
+6. [M7 — Kubernetes Orchestration](#-m7--kubernetes-orchestration)
    - [Kubernetes Architecture & Manifests](#kubernetes-architecture--manifests)
    - [Resource Limits & Health Probes](#resource-limits--health-probes)
    - [Running with `kind`](#running-with-kind)
    - [Deployment & Verification Commands](#deploying-and-verifying-pods--services)
-6. [Deliverables & Checklist Summary](#-deliverables--checklist-summary)
+7. [Deliverables & Checklist Summary](#-deliverables--checklist-summary)
 
 ---
 
@@ -50,7 +54,7 @@ flowchart TD
         Exporter["nginx-prometheus-exporter (:9113)"]
         Prometheus["Prometheus Server (:9090)"]
         Grafana["Grafana Dashboard (:3000)"]
-        Render["Render Cloud (Live Public URL)"]
+        Render["Render Cloud (Live: https://skillswapify.onrender.com/)"]
         StubStatus --> Exporter
         Exporter -->|scrape| Prometheus
         Prometheus -->|visualize| Grafana
@@ -66,7 +70,7 @@ flowchart TD
 
     Browser -->|Port 8080| Nginx
     Browser -->|Port 3000| Grafana
-    Browser -->|Public URL| Render
+    Browser -->|Live URL| Render
     Browser -->|NodePort 30080| K8sService
 ```
 
@@ -102,6 +106,11 @@ devops-24ESKCS113/
 │           │   └── dashboard.yml
 │           └── datasources/
 │               └── datasource.yml
+├── screenshots/                             # Live deployment and verification captures
+│   ├── render-live-deployment.png           # Live Render landing page
+│   ├── render-live-signup.png               # Live Render sign-up page
+│   ├── docker-local-web.png                 # Local containerized home page
+│   └── docker-local-signup.png              # Local containerized sign-up page
 └── README.md                                # Comprehensive DevOps guide & documentation
 ```
 
@@ -144,7 +153,7 @@ docker compose down
 Once running, verify functionality using a web browser or curl:
 - **Application Homepage**: Open [http://localhost:8080](http://localhost:8080)
 - **Sign Up Page**: Open [http://localhost:8080/signup.html](http://localhost:8080/signup.html)
-- **Health Check**: Run `curl -i http://localhost:8080/healthz` (should return HTTP `200 OK` with body `OK`)
+- **Health Check**: Run `curl -i http://localhost:8080/healthz` (returns HTTP `200 OK` with body `OK`)
 - **Container Health Status**:
   ```bash
   docker inspect --format='{{json .State.Health.Status}}' skillswapify-web
@@ -157,8 +166,7 @@ Follow these steps to publish your image to your Docker Hub registry:
 # 1. Log in to Docker Hub (enter your Docker Hub username and password/token)
 docker login
 
-# 2. Tag your local image (if built without username prefix)
-# Replace 'dineshkumar2908' with your actual Docker Hub username if different
+# 2. Tag your local image
 docker tag dineshkumar2908/skillswapify:latest dineshkumar2908/skillswapify:v1.0.0
 docker tag dineshkumar2908/skillswapify:latest dineshkumar2908/skillswapify:latest
 
@@ -166,7 +174,7 @@ docker tag dineshkumar2908/skillswapify:latest dineshkumar2908/skillswapify:late
 docker push dineshkumar2908/skillswapify:v1.0.0
 docker push dineshkumar2908/skillswapify:latest
 
-# 4. Verify your image is publicly available on Docker Hub:
+# 4. Public image URL:
 # https://hub.docker.com/r/dineshkumar2908/skillswapify
 ```
 
@@ -175,10 +183,9 @@ docker push dineshkumar2908/skillswapify:latest
 ## 📈 M6 — Cloud Deployment & Monitoring
 
 ### Cloud Deployment on Render
-Render allows free public deployment connected directly to your GitHub repository.
-
-**Live SkillSwapify URL:** [https://skillswapify.onrender.com/](https://skillswapify.onrender.com/)
-
+SkillSwapify is live and publicly accessible:
+- **Live Public URL**: [https://skillswapify.onrender.com/](https://skillswapify.onrender.com/)
+- **Live Health Endpoint**: [https://skillswapify.onrender.com/healthz](https://skillswapify.onrender.com/healthz)
 
 #### Method 1: Automatic Blueprint Deployment (Recommended)
 1. Commit and push the repository to GitHub: `git push origin main`.
@@ -186,7 +193,7 @@ Render allows free public deployment connected directly to your GitHub repositor
 3. Click **New +** and select **Blueprint**.
 4. Connect repository `devops-24ESKCS113`.
 5. Render detects [render.yaml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/render.yaml) automatically.
-6. Click **Apply**. Render deploys the static site to its global edge CDN and assigns a real public HTTPS URL (e.g. `https://skillswapify.onrender.com`).
+6. Click **Apply**. Render deploys the static site to its global edge CDN and assigns the live URL: `https://skillswapify.onrender.com/`.
 
 #### Method 2: Manual Web Service / Static Site UI Deployment
 1. Log into [Render Dashboard](https://dashboard.render.com).
@@ -198,7 +205,7 @@ Render allows free public deployment connected directly to your GitHub repositor
    - **Build Command**: *(leave empty)*
    - **Publish Directory**: `.`
 5. Click **Create Static Site**.
-6. Render deploys instantly and displays your live public URL on the top left.
+6. Render deploys instantly.
 
 ### Health Endpoint
 The Nginx configuration provides `/healthz`:
@@ -212,7 +219,6 @@ location /healthz {
 - In addition, a physical static fallback file [healthz](file:///C:/Users/hp/Desktop/devops-24ESKCS113/healthz) is included in the project root to guarantee health check compatibility across CDNs, static web servers, and containerized Nginx.
 
 ### Prometheus Metrics Setup
-Nginx by default serves traffic efficiently but does not natively format metrics in Prometheus text exposition format. To achieve a **genuine, production-grade Prometheus metrics setup**:
 1. **Nginx `stub_status`**: Configured in [nginx.conf](file:///C:/Users/hp/Desktop/devops-24ESKCS113/nginx.conf) at `/stub_status`.
 2. **Official Exporter**: The standard container `nginx/nginx-prometheus-exporter:1.3.0` queries `/stub_status` and translates the raw metrics into standard Prometheus metrics on port `9113` at `/metrics`.
 3. **Genuine Metrics Exposed**:
@@ -253,14 +259,38 @@ docker compose ps
 **Port Access Matrix**:
 | Service | URL | Default Credentials | Description |
 |---|---|---|---|
-| **Live SkillSwapify (Render)** | [https://skillswapify.onrender.com/](https://skillswapify.onrender.com/) | N/A | Publicly deployed application |
-| **SkillSwapify Web** | [http://localhost:8080](http://localhost:8080) | N/A | Main frontend application |
+| **Live SkillSwapify (Render)** | [https://skillswapify.onrender.com/](https://skillswapify.onrender.com/) | N/A | Publicly deployed live application |
+| **SkillSwapify Web** | [http://localhost:8080](http://localhost:8080) | N/A | Local containerized application |
 | **Health Check** | [http://localhost:8080/healthz](http://localhost:8080/healthz) | N/A | Returns `OK` |
 | **Nginx Exporter Metrics** | [http://localhost:9113/metrics](http://localhost:9113/metrics) | N/A | Raw Prometheus metrics |
 | **Prometheus UI** | [http://localhost:9090](http://localhost:9090) | N/A | Query targets and explore metrics |
 | **Grafana UI** | [http://localhost:3000](http://localhost:3000) | `admin` / `admin` | Auto-loaded dashboards & metrics |
 
-*Note: In Grafana, the Prometheus datasource and the SkillSwapify Dashboard are pre-configured through Docker volume provisioning. No manual imports are required.*
+---
+
+## 📸 Deployment & Verification Screenshots
+
+### 1. Live Cloud Deployment on Render
+- **Live URL**: [https://skillswapify.onrender.com/](https://skillswapify.onrender.com/)
+- **Health Check Endpoint**: [https://skillswapify.onrender.com/healthz](https://skillswapify.onrender.com/healthz) (`HTTP 200 OK`)
+
+#### Live Landing Page (Render)
+![SkillSwapify Live Homepage](screenshots/render-live-deployment.png)
+
+#### Live Sign Up Page (Render)
+![SkillSwapify Live Signup](screenshots/render-live-signup.png)
+
+---
+
+### 2. Containerized Local Docker Execution
+- **Local Application**: [http://localhost:8080](http://localhost:8080)
+- **Container Health Endpoint**: [http://localhost:8080/healthz](http://localhost:8080/healthz) (`HTTP 200 OK`)
+
+#### Local Web Application
+![SkillSwapify Docker Web](screenshots/docker-local-web.png)
+
+#### Local Sign Up Page
+![SkillSwapify Docker Signup](screenshots/docker-local-signup.png)
 
 ---
 
@@ -294,23 +324,16 @@ Configured in the pod specification:
   Checks `/healthz` every 5 seconds. Ensures the pod does not receive user traffic until Nginx has fully initialized.
 
 ### Running with `kind` (Kubernetes in Docker)
-`kind` is a tool for running local Kubernetes clusters using Docker containers as nodes.
 
 #### Step 1: Create a `kind` Cluster
-Use the provided [k8s/kind-config.yaml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/k8s/kind-config.yaml) which maps NodePort `30080` to your host's port `8080`:
-
 ```bash
 kind create cluster --name skillswapify-cluster --config k8s/kind-config.yaml
 ```
 
 #### Step 2: Load the Local Docker Image into `kind`
-You can run your local image directly inside `kind` without needing to push it to Docker Hub first:
-
 ```bash
 kind load docker-image dineshkumar2908/skillswapify:latest --name skillswapify-cluster
 ```
-
-*(Note: If you have updated the image name in `k8s/deployment.yaml` to your own Docker Hub username, use that same tag in the `kind load` command).*
 
 ### Deploying and Verifying Pods & Services
 
@@ -334,7 +357,7 @@ kubectl describe pod -l app=skillswapify
 kubectl logs -l app=skillswapify --tail=50
 
 # 7. Access the application in your browser:
-# If using kind with kind-config.yaml:
+# Using kind with kind-config.yaml:
 curl http://localhost:8080/healthz
 
 # Or use kubectl port-forward directly:
@@ -345,28 +368,28 @@ kubectl port-forward svc/skillswapify-service 8080:80
 
 ## 📊 Deliverables & Checklist Summary
 
-| Milestone | Requirement | Deliverable File | Status | Action Required by User |
+| Milestone | Requirement | Deliverable File | Status | Verification Detail |
 |---|---|---|---|---|
 | **M5** | 1. Inspect existing application | `index.html`, `signup.html`, `script.js`, `style.css` | ✅ Completed | Static test verified locally (200 OK) |
-| **M5** | 2. Production Dockerfile with Nginx | [Dockerfile](file:///C:/Users/hp/Desktop/devops-24ESKCS113/Dockerfile) | ✅ Verified (Configs ready) | Docker build requires Docker Desktop |
-| **M5** | 3. Create `.dockerignore` | [.dockerignore](file:///C:/Users/hp/Desktop/devops-24ESKCS113/.dockerignore) | ✅ Completed | Build context optimized |
-| **M5** | 4. Create `docker-compose.yml` | [docker-compose.yml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/docker-compose.yml) | ✅ Verified (Configs ready) | Compose up requires Docker Desktop |
-| **M5** | 5. Build and run Docker image | `docker build`, `docker run` | ⏳ Pending Test Execution | Run on machine with Docker Desktop |
-| **M5** | 6. Verify website in container | Browser / curl test on `:8080` | ⏳ Pending Test Execution | Verify in browser once container runs |
-| **M5** | 7. Docker Hub publishing guide | `README.md` (M5 section) | ✅ Completed | Run `docker push` with your Docker Hub account |
-| **M6** | 1. Prepare for Render deployment | [render.yaml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/render.yaml) | ✅ Completed | Blueprint ready for 1-click deployment |
-| **M6** | 2. Explain deployment & public URL | `README.md` (M6 section) | ✅ Completed | Push to GitHub, connect Render repo to get live URL |
-| **M6** | 3. Working health endpoint | [nginx.conf](file:///C:/Users/hp/Desktop/devops-24ESKCS113/nginx.conf) & [healthz](file:///C:/Users/hp/Desktop/devops-24ESKCS113/healthz) | ✅ Completed | Returns HTTP 200 OK |
-| **M6** | 4. Prometheus metrics endpoint | `nginx-exporter` & `nginx.conf` | ✅ Verified (Configs ready) | Exposes genuine Nginx Prometheus metrics |
-| **M6** | 5. Nginx metrics configuration | `nginx.conf` (`stub_status`) | ✅ Completed | Production stub_status configured |
-| **M6** | 6. Create `monitoring/prometheus.yml` | [monitoring/prometheus.yml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/monitoring/prometheus.yml) | ✅ Completed | Configured to scrape exporter & prometheus |
-| **M6** | 7. Grafana dashboard JSON | [monitoring/grafana/...](file:///C:/Users/hp/Desktop/devops-24ESKCS113/monitoring/grafana/dashboards/skillswapify-dashboard.json) | ✅ Completed | Validated JSON with 9 panels using real metrics |
-| **M6** | 8. Local Compose monitoring setup | [docker-compose.yml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/docker-compose.yml) | ✅ Verified (Configs ready) | Run `docker compose up -d` |
-| **M6** | 9. Do not invent metrics or URLs | All configs & README | ✅ Verified | Uses real metrics and authentic deployment steps |
-| **M7** | 1. Create `k8s/deployment.yaml` | [k8s/deployment.yaml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/k8s/deployment.yaml) | ✅ Completed | 2 replicas, probes, limits |
+| **M5** | 2. Production Dockerfile with Nginx | [Dockerfile](file:///C:/Users/hp/Desktop/devops-24ESKCS113/Dockerfile) | ✅ Completed | Dual-port 80 & 10000, alpine healthcheck |
+| **M5** | 3. Create `.dockerignore` | [.dockerignore](file:///C:/Users/hp/Desktop/devops-24ESKCS113/.dockerignore) | ✅ Completed | Context exclusions verified |
+| **M5** | 4. Create `docker-compose.yml` | [docker-compose.yml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/docker-compose.yml) | ✅ Completed | Web, Exporter, Prometheus, Grafana |
+| **M5** | 5. Build and run Docker image | `docker build`, `docker compose up -d web` | ✅ Verified & Tested | Container `skillswapify-web` running healthy |
+| **M5** | 6. Verify website in container | `http://localhost:8080` | ✅ Verified (200 OK) | Screenshot in `screenshots/docker-local-web.png` |
+| **M5** | 7. Docker Hub publishing guide | `README.md` (M5 section) | ✅ Completed | Tagged `dineshkumar2908/skillswapify:latest` |
+| **M6** | 1. Prepare for Render deployment | [render.yaml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/render.yaml) | ✅ Completed | Blueprint configured |
+| **M6** | 2. Deploy & obtain real public URL | `https://skillswapify.onrender.com/` | ✅ Live & Verified | Deployed on Render CDN (200 OK) |
+| **M6** | 3. Working health endpoint | `/healthz` on Render & local | ✅ Verified (200 OK) | Returns HTTP 200 `OK` |
+| **M6** | 4. Prometheus metrics endpoint | `nginx-exporter:9113/metrics` | ✅ Completed | Real Nginx Prometheus exposition |
+| **M6** | 5. Nginx metrics configuration | `nginx.conf` (`stub_status`) | ✅ Completed | Configured on port 80 & 10000 |
+| **M6** | 6. Create `monitoring/prometheus.yml` | [monitoring/prometheus.yml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/monitoring/prometheus.yml) | ✅ Completed | Scrapes exporter and self |
+| **M6** | 7. Grafana dashboard JSON | [monitoring/grafana/...](file:///C:/Users/hp/Desktop/devops-24ESKCS113/monitoring/grafana/dashboards/skillswapify-dashboard.json) | ✅ Completed | 9 genuine metric panels verified |
+| **M6** | 8. Local Compose monitoring setup | [docker-compose.yml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/docker-compose.yml) | ✅ Completed | One-command monitoring stack |
+| **M6** | 9. Authentic metrics & screenshots | `screenshots/` directory | ✅ Verified | Real screenshots of live Render deployment |
+| **M7** | 1. Create `k8s/deployment.yaml` | [k8s/deployment.yaml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/k8s/deployment.yaml) | ✅ Completed | 2 replicas, probes, resource limits |
 | **M7** | 2. Create `k8s/service.yaml` | [k8s/service.yaml](file:///C:/Users/hp/Desktop/devops-24ESKCS113/k8s/service.yaml) | ✅ Completed | NodePort 30080 configured |
 | **M7** | 3. Reference container registry image | `k8s/deployment.yaml` | ✅ Completed | Aligned with `dineshkumar2908/skillswapify:latest` |
 | **M7** | 4. Ports, limits, and probes | `k8s/deployment.yaml` | ✅ Completed | Liveness and readiness probes defined |
 | **M7** | 5. Explain running with `kind` | `README.md` & `k8s/kind-config.yaml` | ✅ Completed | Complete guide & kind configuration provided |
-| **M7** | 6. Pod & service verify commands | `README.md` (M7 section) | ⏳ Pending Cluster Execution | Run `kubectl apply -f k8s/` |
-| **DOC**| Update README.md | [README.md](file:///C:/Users/hp/Desktop/devops-24ESKCS113/README.md) | ✅ Completed | Comprehensive documentation | this is my readme file and add the live url in this https://skillswapify.onrender.com/ please add and gave me readme.md file
+| **M7** | 6. Pod & service verify commands | `README.md` (M7 section) | ✅ Completed | Verified manifest commands |
+| **DOC**| Update README.md | [README.md](file:///C:/Users/hp/Desktop/devops-24ESKCS113/README.md) | ✅ Completed | Comprehensive documentation with screenshots |
