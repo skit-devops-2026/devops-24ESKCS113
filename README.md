@@ -177,6 +177,9 @@ docker push dineshkumar2908/skillswapify:latest
 ### Cloud Deployment on Render
 Render allows free public deployment connected directly to your GitHub repository.
 
+**Live SkillSwapify URL:** [https://skillswapify.onrender.com/](https://skillswapify.onrender.com/)
+
+
 #### Method 1: Automatic Blueprint Deployment (Recommended)
 1. Commit and push the repository to GitHub: `git push origin main`.
 2. Go to [https://dashboard.render.com](https://dashboard.render.com).
@@ -250,6 +253,7 @@ docker compose ps
 **Port Access Matrix**:
 | Service | URL | Default Credentials | Description |
 |---|---|---|---|
+| **Live SkillSwapify (Render)** | [https://skillswapify.onrender.com/](https://skillswapify.onrender.com/) | N/A | Publicly deployed application |
 | **SkillSwapify Web** | [http://localhost:8080](http://localhost:8080) | N/A | Main frontend application |
 | **Health Check** | [http://localhost:8080/healthz](http://localhost:8080/healthz) | N/A | Returns `OK` |
 | **Nginx Exporter Metrics** | [http://localhost:9113/metrics](http://localhost:9113/metrics) | N/A | Raw Prometheus metrics |
@@ -365,4 +369,4 @@ kubectl port-forward svc/skillswapify-service 8080:80
 | **M7** | 4. Ports, limits, and probes | `k8s/deployment.yaml` | ✅ Completed | Liveness and readiness probes defined |
 | **M7** | 5. Explain running with `kind` | `README.md` & `k8s/kind-config.yaml` | ✅ Completed | Complete guide & kind configuration provided |
 | **M7** | 6. Pod & service verify commands | `README.md` (M7 section) | ⏳ Pending Cluster Execution | Run `kubectl apply -f k8s/` |
-| **DOC**| Update README.md | [README.md](file:///C:/Users/hp/Desktop/devops-24ESKCS113/README.md) | ✅ Completed | Comprehensive documentation |
+| **DOC**| Update README.md | [README.md](file:///C:/Users/hp/Desktop/devops-24ESKCS113/README.md) | ✅ Completed | Comprehensive documentation | this is my readme file and add the live url in this https://skillswapify.onrender.com/ please add and gave me readme.md file
